@@ -51,3 +51,9 @@ class Plane:
             coordinate_without_offset(coord, offset)
             for coord, offset in zip(target, self.offset)
         ))
+
+    def from_local_coordinates(self, target: Tuple[int, int]) -> Coordinates:
+        return tuple((
+            coordinate_with_offset(coord, offset)
+            for coord, offset in zip(target, self.offset)
+        ))

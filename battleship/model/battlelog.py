@@ -12,13 +12,19 @@ class BattleMove:
 
 
 @dataclass(frozen=False)
-class BattlefieldCell:
+class HitmapCell:
     was_hit: bool = False
     contents: Optional[Ship] = None
 
 
+@dataclass(frozen=True)
+class Hitmap:
+    map: List[List[HitmapCell]]
+    battlefield: Battlefield
+
+
 class BattleLog:
-    _hitmaps: Dict[str, List[List[BattlefieldCell]]]
+    _hitmaps: Dict[str, Hitmap]
     _battlefields: Dict[str, Battlefield]
     _current_player: str
     _battle_log: List[BattleMove]
@@ -26,26 +32,45 @@ class BattleLog:
     def __init__(self, battlefields: Dict[str, Battlefield]):
         self._battlefields = battlefields.copy()
         self._hitmaps = {
-            player: [
-                [ BattlefieldCell() for y in range(bf.plane.size[0]) ]
-                for x in range(bf.plane.size[0])
-            ]
+            player: Hitmap(
+                [
+                    [HitmapCell() for y in range(bf.plane.size[0])]
+                    for x in range(bf.plane.size[0])
+                ],
+                bf
+            )
             for player, bf in self._battlefields.items()
         }
         for player, bf in self._battlefields.items():
             for ship in bf.ships:
                 for c in ship.coordinates:
-                    self._hitmaps[player][c[0]][c[1]].contents = ship
+                    x, y = bf.plane.to_local_coordinates(c)
+                    self._hitmaps[player].map[x][y].contents = ship
         self._current_player = next(iter(self._battlefields.keys()))
         self._battle_log = []
 
     @property
-    def hitmaps(self) -> Dict[str, List[List[BattlefieldCell]]]:
+    def another_player(self):
+        if len(self._hitmaps) == 1:
+            return self._current_player
+        else:
+            return [
+                player
+                for player in self._battlefields
+                if player != self._current_player
+            ][0]
+
+
+    @property
+    def hitmaps(self) -> Dict[str, Hitmap]:
         return {
-            player: [
-                [ BattlefieldCell(cell.was_hit, cell.contents) for cell in column ]
-                for column in hitmap
-            ]
+            player: Hitmap(
+                [
+                    [HitmapCell(cell.was_hit, cell.contents) for cell in column]
+                    for column in hitmap.map
+                ],
+                hitmap.battlefield
+            )
             for player, hitmap in self._hitmaps.items()
         }
 
@@ -57,7 +82,7 @@ class BattleLog:
     def winner(self) -> Optional[str]:
         for player, hitmap in self._hitmaps.items():
             if all(cell.was_hit
-                   for column in hitmap
+                   for column in hitmap.map
                    for cell in column
                    if cell.contents is not None):
                 return player
@@ -68,15 +93,11 @@ class BattleLog:
             return
 
         x, y = bf_plane.to_local_coordinates(target)
-        self._hitmaps[self._current_player][x][y].was_hit = True
+        self._hitmaps[self._current_player].map[x][y].was_hit = True
         self._battle_log.append(
             BattleMove(
                 player=self._current_player,
                 target=target
             )
         )
-        self._current_player = [
-            player
-            for player in self._battlefields
-            if player != self._current_player
-        ][0]
+        self._current_player = self.another_player
