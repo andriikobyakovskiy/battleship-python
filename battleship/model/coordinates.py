@@ -1,4 +1,3 @@
-from itertools import product
 from typing import Tuple, Union, List
 from dataclasses import dataclass
 
@@ -38,17 +37,17 @@ class Plane:
 
     @property
     def coordinates(self) -> List[Coordinates]:
-        return list(
-            product(
-                *(
-                    (coordinate_with_offset(i, offset) for i in range(dimension))
-                    for offset, dimension in zip(self.offset, self.size)
-                )
+        return [
+            (
+                coordinate_with_offset(x, self.offset[0]),
+                coordinate_with_offset(y, self.offset[1]),
             )
-        )
+            for y in range(self.size[1])
+            for x in range(self.size[0])
+        ]
 
     def to_local_coordinates(self, target: Coordinates) -> Tuple[int, int]:
-        return tuple(iterable=(
+        return tuple((
             coordinate_without_offset(coord, offset)
             for coord, offset in zip(target, self.offset)
         ))
