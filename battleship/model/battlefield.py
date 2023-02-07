@@ -21,9 +21,9 @@ class Ship:
     def coordinates(self) -> List[Coordinates]:
         offset_x, offset_y = self.position
         return [
-            (offset_x, coordinate_with_offset(i, offset_y))
+            (coordinate_with_offset(i, offset_x), offset_y)
             if self.orientation == Ship.Orientation.HORIZONTAL
-            else (coordinate_with_offset(i, offset_x), offset_y)
+            else (offset_x, coordinate_with_offset(i, offset_y))
             for i in range(self.length)
         ]
 
