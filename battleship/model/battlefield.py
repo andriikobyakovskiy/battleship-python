@@ -49,3 +49,13 @@ class Battlefield:
                     )
 
         self.ships.append(ship)
+
+    def remove_ship(self, target: Coordinates) -> Optional[Ship]:
+        print([s.coordinates for s in self.ships])
+        ships_to_remove = [s for s in self.ships if target in s.coordinates]
+        if not ships_to_remove:
+            return None
+
+        result = ships_to_remove[0]
+        self.ships.remove(result)
+        return result

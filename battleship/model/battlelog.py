@@ -1,8 +1,9 @@
-from typing import Optional, Dict, List
+from typing import Optional, Dict, List, Tuple
 from dataclasses import dataclass
 
 from battleship.model.battlefield import Ship, Battlefield
 from battleship.model.coordinates import Coordinates
+from battleship.model.couple import Couple
 
 
 @dataclass(frozen=True)
@@ -24,14 +25,13 @@ class Hitmap:
 
 
 class BattleLog:
-    _hitmaps: Dict[str, Hitmap]
-    _battlefields: Dict[str, Battlefield]
-    _current_player: str
+    _hitmaps: Couple[Hitmap]
+    _battlefields: Couple[Battlefield]
     _battle_log: List[BattleMove]
 
     def __init__(self, battlefields: Dict[str, Battlefield]):
-        self._battlefields = battlefields.copy()
-        self._hitmaps = {
+        self._battlefields = Couple(battlefields.copy())
+        self._hitmaps = Couple({
             player: Hitmap(
                 [
                     [HitmapCell() for y in range(bf.plane.size[0])]
@@ -40,43 +40,25 @@ class BattleLog:
                 bf
             )
             for player, bf in self._battlefields.items()
-        }
+        })
         for player, bf in self._battlefields.items():
+            self._hitmaps.set_current(player)
             for ship in bf.ships:
                 for c in ship.coordinates:
                     x, y = bf.plane.to_local_coordinates(c)
-                    self._hitmaps[player].map[x][y].contents = ship
-        self._current_player = next(iter(self._battlefields.keys()))
+                    self._hitmaps.current_value.map[x][y].contents = ship
+        self._hitmaps.switch_current()
         self._battle_log = []
 
-    @property
-    def another_player(self):
-        if len(self._hitmaps) == 1:
-            return self._current_player
-        else:
-            return [
-                player
-                for player in self._battlefields
-                if player != self._current_player
-            ][0]
-
-
-    @property
-    def hitmaps(self) -> Dict[str, Hitmap]:
-        return {
-            player: Hitmap(
-                [
-                    [HitmapCell(cell.was_hit, cell.contents) for cell in column]
-                    for column in hitmap.map
-                ],
-                hitmap.battlefield
-            )
-            for player, hitmap in self._hitmaps.items()
-        }
+    def get_marked_hitmaps(self) -> List[Tuple[Hitmap, bool]]:
+        return [
+            (self._hitmaps.another_value, False),
+            (self._hitmaps.current_value, True),
+        ]
 
     @property
     def current_player(self) -> str:
-        return self._current_player
+        return self._hitmaps.current_key
 
     @property
     def winner(self) -> Optional[str]:
@@ -88,16 +70,18 @@ class BattleLog:
                 return player
 
     def make_move(self, target: Coordinates) -> Optional[str]:
-        bf_plane = self._battlefields[self._current_player].plane
+        bf_plane = self._battlefields.current_value.plane
         if target not in bf_plane:
             return
 
         x, y = bf_plane.to_local_coordinates(target)
-        self._hitmaps[self._current_player].map[x][y].was_hit = True
+        self._hitmaps.another_value.map[x][y].was_hit = True
         self._battle_log.append(
             BattleMove(
-                player=self._current_player,
+                player=self._hitmaps.current_key,
                 target=target
             )
         )
-        self._current_player = self.another_player
+        self._hitmaps.switch_current()
+        self._battlefields.switch_current()
+        return self.winner

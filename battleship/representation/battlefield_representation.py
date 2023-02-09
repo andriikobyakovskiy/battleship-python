@@ -7,13 +7,14 @@ from battleship.model.battlefield import Battlefield
 class BattlefieldRepresentation:
     _battlefield: Battlefield
 
-    _VERTICAL_AXIS_LABELS_LENGTH = 2
+    _VERTICAL_AXIS_LABELS_LENGTH = 3
 
     def __init__(self, battlefield: Battlefield):
         self._battlefield = battlefield
         self._ships_coordinates = reduce(
-            lambda a, b: a + b,
-            [set(s.coordinates) for s in self._battlefield.ships]
+            lambda a, b: a.union(b),
+            [set(s.coordinates) for s in self._battlefield.ships],
+            set()
         )
 
     def get_representation(self, console_width: int) -> str:
@@ -42,7 +43,7 @@ class BattlefieldRepresentation:
         result = self._represent_header(offset, width)
         result += "\n" + "".join("-" if c != " " else " " for c in result) + "\n"
         return result + "\n".join(
-            "{}|".format(self._battlefield.plane.from_local_coordinates((0, y))[1]) +
+            "{0: >2}|".format(self._battlefield.plane.from_local_coordinates((0, y))[1]) +
             "".join("S" if self._battlefield.plane.from_local_coordinates((x, y)) in self._ships_coordinates else " "
                     for x in range(width))
             for y in range(self._battlefield.plane.size[1])
