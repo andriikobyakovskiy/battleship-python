@@ -9,10 +9,10 @@ class HitmapRepresentation:
     DoShowShips = bool
     _hitmaps: List[Tuple[Hitmap, DoShowShips]]
 
-    _VERTICAL_AXIS_LABELS_LENGTH = 2
+    _VERTICAL_AXIS_LABELS_LENGTH = 3
 
-    def __init__(self, battlefield: Hitmap, show_ships: bool = False):
-        self._hitmaps = [(battlefield, show_ships)]
+    def __init__(self, hitmaps):
+        self._hitmaps = hitmaps
 
     def __add__(self, other: HitmapRepresentation) -> HitmapRepresentation:
         if any(hm.battlefield.plane.size != self._hitmaps[0][0].battlefield.plane.size for hm, _ in other._hitmaps):
@@ -83,7 +83,7 @@ class HitmapRepresentation:
         offset: Optional[int] = None,
         width: Optional[int] = None,
     ) -> str:
-        result = "{}|".format(hitmap.battlefield.plane.from_local_coordinates((0, y))[1])
+        result = "{0: >2}|".format(hitmap.battlefield.plane.from_local_coordinates((0, y))[1])
         offset = offset or 0
         width = width or hitmap.battlefield.plane.size[0]
         return result + "".join(

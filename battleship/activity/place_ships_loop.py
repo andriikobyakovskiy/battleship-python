@@ -46,7 +46,7 @@ class PlaceShipsLoop(SinglePlayerLoop[PlacementResult]):
                 "Enter 'ready' to submit ships positions\n"
                 ">>> "
             ))
-            match_remove = self._remove_ship_regexp.match(final_input)
+            match_remove = self._remove_ship_regexp.fullmatch(final_input)
             if match_remove:
                 return self._try_remove(**match_remove.groupdict())
 
@@ -61,13 +61,13 @@ class PlaceShipsLoop(SinglePlayerLoop[PlacementResult]):
             "To add ship enter start coordinates, orientation (H or V) and ship length (for example 'A1H3')\n"
             ">>> "
         ))
-        match_add = self._add_ship_regexp.match(ship_input)
+        match_add = self._add_ship_regexp.fullmatch(ship_input)
         if match_add:
             if self._ships_count[int(match_add.group("length"))] <= 0:
                 return Error(f"No ships of length {match_add.group('length')} left")
             return self._try_add(**match_add.groupdict())
 
-        match_remove = self._remove_ship_regexp.match(ship_input)
+        match_remove = self._remove_ship_regexp.fullmatch(ship_input)
         if match_remove:
             return self._try_remove(**match_remove.groupdict())
 

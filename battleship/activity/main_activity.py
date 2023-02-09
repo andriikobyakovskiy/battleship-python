@@ -2,11 +2,14 @@ import os
 
 from battleship.activity.activity import Activity
 from battleship.activity.enter_names_acitivty import EnterNamesActivity
+from battleship.activity.game_loop import GameLoop
 from battleship.activity.game_state import GameState
 from battleship.activity.place_ships_loop import PlaceShipsLoop
 from battleship.activity.start_menu_activity import StartMenuActivity
 from battleship.activity.two_players_activity import TwoPlayersActivity
+from battleship.activity.victory_activity import VictoryActivity
 from battleship.model.battlefield import Battlefield
+from battleship.model.battlelog import BattleLog
 from battleship.model.coordinates import Plane
 from battleship.model.couple import Couple
 from battleship.model.settings import Settings
@@ -53,17 +56,26 @@ class MainActivity(Activity):
                 loops=battlefields.map_values(
                     lambda bf: PlaceShipsLoop(bf, self._settings.ships_count)
                 ),
-                next_state=GameState.START_MENU,
+                next_state=GameState.GAME,
                 activity_end_check=lambda loops: all((
                     loop.all_ships_placed()
                     for loop in loops.values()
                 ))
-                # turn_end_check=lambda result: not isinstance(result, PlacingError),
-                # activity_end_check=lambda result: isinstance(result, PlacingReady),
-                # get_error_from_result=lambda result: result.message if isinstance(result, PlacingError) else None,
-                # players_switch_placeholder=lambda next_player: input(
-                #     f"Awaiting for player {next_player}. Press Enter to continue..."
-                # ),
             )
+        if self._current_state == GameState.GAME:
+            if not isinstance(self._last_result, Couple):
+                raise Exception("Expected Couple of battlefields as last activity result")
+            battle_log = BattleLog(self._last_result)
+            return TwoPlayersActivity(
+                loops=self._last_result.map_values(
+                    lambda _: GameLoop(battle_log)
+                ),
+                next_state=GameState.VICTORY,
+                activity_end_check=lambda _: battle_log.winner is not None
+            )
+        if self._current_state == GameState.VICTORY:
+            if not isinstance(self._last_result, Couple):
+                raise Exception("Expected Couple of BattleLogs as last activity result")
+            return VictoryActivity(self._last_result.current_value, self._settings)
 
         return ActivityPlaceholder(self._current_state)

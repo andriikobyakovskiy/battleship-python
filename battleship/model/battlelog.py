@@ -1,9 +1,10 @@
-from typing import Optional, Dict, List, Tuple
+from typing import Optional, List, Tuple
 from dataclasses import dataclass
 
 from battleship.model.battlefield import Ship, Battlefield
 from battleship.model.coordinates import Coordinates
 from battleship.model.couple import Couple
+from battleship.model.exceptions import CoordinatesValueException
 
 
 @dataclass(frozen=True)
@@ -29,8 +30,8 @@ class BattleLog:
     _battlefields: Couple[Battlefield]
     _battle_log: List[BattleMove]
 
-    def __init__(self, battlefields: Dict[str, Battlefield]):
-        self._battlefields = Couple(battlefields.copy())
+    def __init__(self, battlefields: Couple[Battlefield]):
+        self._battlefields = battlefields
         self._hitmaps = Couple({
             player: Hitmap(
                 [
@@ -69,19 +70,22 @@ class BattleLog:
                    if cell.contents is not None):
                 return player
 
-    def make_move(self, target: Coordinates) -> Optional[str]:
+    def make_move(self, target: Coordinates) -> bool:
         bf_plane = self._battlefields.current_value.plane
         if target not in bf_plane:
-            return
+            raise CoordinatesValueException(f"Coordinates {target} are out of battlefield")
 
         x, y = bf_plane.to_local_coordinates(target)
         self._hitmaps.another_value.map[x][y].was_hit = True
+        result = self._hitmaps.another_value.map[x][y].contents
         self._battle_log.append(
             BattleMove(
                 player=self._hitmaps.current_key,
                 target=target
             )
         )
-        self._hitmaps.switch_current()
-        self._battlefields.switch_current()
-        return self.winner
+        if result is None:
+            self._hitmaps.switch_current()
+            self._battlefields.switch_current()
+            return False
+        return True
