@@ -1,7 +1,7 @@
 from typing import List
 
 from battleship.activity.activity import Activity
-from battleship.activity.game_state import GameStage
+from battleship.activity.game_stage import GameStage
 
 
 class EnterNamesActivity(Activity):

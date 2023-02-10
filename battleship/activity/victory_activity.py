@@ -3,7 +3,7 @@ import json
 from uuid import uuid4
 
 from battleship.activity.activity import Activity
-from battleship.activity.game_state import GameStage
+from battleship.activity.game_stage import GameStage
 from battleship.model.battlefield import Ship
 from battleship.model.battlelog import BattleLog
 from battleship.model.settings import Settings

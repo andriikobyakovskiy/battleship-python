@@ -1,10 +1,13 @@
 import os
 from abc import ABC, abstractmethod
 
-from battleship.activity.game_state import GameStage
+from battleship.activity.game_stage import GameStage
 
 
 class Activity(ABC):
+    """
+    Class that manages user interaction flow
+    """
 
     @staticmethod
     def clean_console():

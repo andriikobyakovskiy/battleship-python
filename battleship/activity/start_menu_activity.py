@@ -1,5 +1,5 @@
 from battleship.activity.activity import Activity
-from battleship.activity.game_state import GameStage
+from battleship.activity.game_stage import GameStage
 
 
 class StartMenuActivity(Activity):
@@ -16,9 +16,9 @@ class StartMenuActivity(Activity):
                     print(self._error)
                 command = input((
                     "Enter action number:\n"
-                    "(1) Start new game\n"
-                    "(2) Show top scores\n"
-                    "(3) Change settings\n"
+                    "(1) New game\n"
+                    "(2) Top scores\n"
+                    "(3) Settings\n"
                     "(0) Exit\n>>> "
                 ))
                 command = int(command)

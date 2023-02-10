@@ -2,7 +2,7 @@ from dataclasses import fields
 from typing import Tuple
 
 from battleship.activity.activity import Activity
-from battleship.activity.game_state import GameStage
+from battleship.activity.game_stage import GameStage
 from battleship.model.coordinates import Coordinates
 from battleship.model.settings import Settings
 
@@ -19,7 +19,10 @@ class SettingsSelectionActivity(Activity):
                 self.clean_console()
                 if self._error:
                     print(self._error)
-                print(f"Current settings: {self._settings}")
+                print(f"Current settings:")
+                for key in ["ships_count", "logs_path"]:
+                    print(f"{key}: {getattr(self._settings, key)}")
+                print("=" * 20)
                 field_values = [
                     field.name
                     for field in fields(self._settings)

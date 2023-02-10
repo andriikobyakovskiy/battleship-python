@@ -71,11 +71,14 @@ class BattleLog:
                 return self._hitmaps.another_key if self.current_player == player else self.current_player
 
     def make_move(self, target: Coordinates) -> bool:
-        bf_plane = self._battlefields.current_value.plane
+        bf_plane = self._battlefields.another_value.plane
         if target not in bf_plane:
             raise CoordinatesValueException(f"Coordinates {target} are out of battlefield")
 
         x, y = bf_plane.to_local_coordinates(target)
+        if self._hitmaps.another_value.map[x][y].was_hit:
+            raise CoordinatesValueException(f"Coordinates {target} are already used")
+
         self._hitmaps.another_value.map[x][y].was_hit = True
         result = self._hitmaps.another_value.map[x][y].contents
         self._battle_log.append(
