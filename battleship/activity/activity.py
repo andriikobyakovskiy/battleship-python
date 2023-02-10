@@ -1,7 +1,7 @@
 import os
 from abc import ABC, abstractmethod
 
-from battleship.activity.game_state import GameState
+from battleship.activity.game_state import GameStage
 
 
 class Activity(ABC):
@@ -11,5 +11,5 @@ class Activity(ABC):
         os.system('cls' if os.name == 'nt' else 'clear')
     
     @abstractmethod
-    def run(self, console_width: int) -> (object, GameState):
+    def run(self, console_width: int) -> (object, GameStage):
         ...

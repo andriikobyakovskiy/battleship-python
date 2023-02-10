@@ -1,7 +1,7 @@
 from enum import Enum
 
 
-class GameState(Enum):
+class GameStage(Enum):
     START_MENU = 'SM'
     ENTER_NAMES = 'E'
     PLACE_SHIPS = 'P'
@@ -11,5 +11,4 @@ class GameState(Enum):
     SETTINGS = 'S'
     SETTINGS_SELECTION = 'SS'
     SETTINGS_CHANGE = 'SC'
-    REPLAY = 'R'
     EXIT = 'X'

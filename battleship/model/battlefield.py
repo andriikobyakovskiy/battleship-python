@@ -1,4 +1,4 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from enum import Enum
 from typing import List, Optional
 
@@ -28,13 +28,10 @@ class Ship:
         ]
 
 
+@dataclass(frozen=True)
 class Battlefield:
     plane: Plane
-    ships: List[Ship]
-
-    def __init__(self, plane: Plane, ships: Optional[List[Ship]] = None):
-        self.plane = plane
-        self.ships = ships.copy() if ships else list()
+    ships: List[Ship] = field(default_factory=list)
 
     def add_ship(self, ship: Ship):
         for c in ship.coordinates:

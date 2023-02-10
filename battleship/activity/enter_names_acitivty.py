@@ -1,12 +1,12 @@
 from typing import List
 
 from battleship.activity.activity import Activity
-from battleship.activity.game_state import GameState
+from battleship.activity.game_state import GameStage
 
 
 class EnterNamesActivity(Activity):
 
-    def run(self, _) -> (List[str], GameState):
+    def run(self, _) -> (List[str], GameStage):
         first_player = None
         while not first_player:
             first_player = input("Enter first player's name:\n>>> ")
@@ -16,4 +16,4 @@ class EnterNamesActivity(Activity):
                 print("PLayers' names cannot be same")
             second_player = input("Enter second player's name:\n>>> ")
 
-        return [first_player, second_player], GameState.PLACE_SHIPS
+        return [first_player, second_player], GameStage.PLACE_SHIPS

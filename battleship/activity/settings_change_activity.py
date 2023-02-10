@@ -1,5 +1,5 @@
 from battleship.activity.activity import Activity
-from battleship.activity.game_state import GameState
+from battleship.activity.game_state import GameStage
 from battleship.model.settings import Settings
 
 
@@ -15,7 +15,7 @@ class SettingsChangeActivity(Activity):
         self._parameter = parameter
         self._error = None
 
-    def run(self, console_width: int) -> (object, GameState):
+    def run(self, console_width: int) -> (object, GameStage):
         result = None
         while not result:
             try:
@@ -42,4 +42,4 @@ class SettingsChangeActivity(Activity):
             except Exception as e:
                 self._error = e.args[0]
 
-        return self._settings, GameState.SETTINGS_SELECTION
+        return self._settings, GameStage.SETTINGS_SELECTION

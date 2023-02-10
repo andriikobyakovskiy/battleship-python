@@ -2,7 +2,7 @@ from dataclasses import fields
 from typing import Tuple
 
 from battleship.activity.activity import Activity
-from battleship.activity.game_state import GameState
+from battleship.activity.game_state import GameStage
 from battleship.model.coordinates import Coordinates
 from battleship.model.settings import Settings
 
@@ -12,7 +12,7 @@ class SettingsSelectionActivity(Activity):
         self._settings = settings
         self._error = None
 
-    def run(self, console_width: int) -> (object, GameState):
+    def run(self, console_width: int) -> (object, GameStage):
         field = None
         while True:
             try:
@@ -32,9 +32,9 @@ class SettingsSelectionActivity(Activity):
                     "\nexit\n>>> "
                 )
                 if field == "exit":
-                    return None, GameState.START_MENU
+                    return None, GameStage.START_MENU
                 if field in field_values:
-                    return field, GameState.SETTINGS_CHANGE
+                    return field, GameStage.SETTINGS_CHANGE
             except Exception:
                 pass
 

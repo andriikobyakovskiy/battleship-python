@@ -26,9 +26,8 @@ class Hitmap:
 
 
 class BattleLog:
-    _hitmaps: Couple[Hitmap]
-    _battlefields: Couple[Battlefield]
-    _battle_log: List[BattleMove]
+
+    POINT_PER_HIT = 10
 
     def __init__(self, battlefields: Couple[Battlefield]):
         self._battlefields = battlefields
@@ -49,6 +48,7 @@ class BattleLog:
                     x, y = bf.plane.to_local_coordinates(c)
                     self._hitmaps.current_value.map[x][y].contents = ship
         self._hitmaps.switch_current()
+        self._score = {player: 0 for player in self._battlefields.keys()}
         self._battle_log = []
 
     def get_marked_hitmaps(self) -> List[Tuple[Hitmap, bool]]:
@@ -84,8 +84,24 @@ class BattleLog:
                 target=target
             )
         )
+
         if result is None:
             self._hitmaps.switch_current()
             self._battlefields.switch_current()
             return False
+
+        self._score[self._hitmaps.current_key] += self.POINT_PER_HIT
         return True
+
+    def to_dict(self):
+        return {
+            **{
+                player: {
+                    "battlefield": bf,
+                    "score": self._score[player],
+                    "is_winner": self.winner == player
+                }
+                for player, bf in self._battlefields.items()
+            },
+            "moves": self._battle_log,
+        }

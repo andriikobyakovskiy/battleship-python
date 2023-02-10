@@ -1,7 +1,7 @@
 from typing import Callable
 
 from battleship.activity.activity import Activity
-from battleship.activity.game_state import GameState
+from battleship.activity.game_state import GameStage
 from battleship.activity.single_player_loop import SinglePlayerLoop
 from battleship.model.couple import Couple
 
@@ -10,7 +10,7 @@ class TwoPlayersActivity(Activity):
 
     def __init__(
         self,
-        next_state: GameState,
+        next_state: GameStage,
         loops: Couple[SinglePlayerLoop],
         activity_end_check: Callable[[Couple[SinglePlayerLoop]], bool],
     ):

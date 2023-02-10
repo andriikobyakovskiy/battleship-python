@@ -1,12 +1,12 @@
 from battleship.activity.activity import Activity
-from battleship.activity.game_state import GameState
+from battleship.activity.game_state import GameStage
 
 
 class StartMenuActivity(Activity):
     def __init__(self):
         self._error = None
 
-    def run(self, console_width: int) -> (None, GameState):
+    def run(self, console_width: int) -> (None, GameStage):
         result = None
         command = None
         while not result:
@@ -18,21 +18,18 @@ class StartMenuActivity(Activity):
                     "Enter action number:\n"
                     "(1) Start new game\n"
                     "(2) Show top scores\n"
-                    "(3) Replay game\n"
-                    "(4) Change settings\n"
+                    "(3) Change settings\n"
                     "(0) Exit\n>>> "
                 ))
                 command = int(command)
                 if command == 1:
-                    return None, GameState.ENTER_NAMES
+                    return None, GameStage.ENTER_NAMES
                 if command == 2:
-                    return None, GameState.SCOREBOARD
+                    return None, GameStage.SCOREBOARD
                 if command == 3:
-                    return None, GameState.REPLAY
-                if command == 4:
-                    return None, GameState.SETTINGS_SELECTION
+                    return None, GameStage.SETTINGS_SELECTION
                 if command == 0:
-                    return None, GameState.EXIT
+                    return None, GameStage.EXIT
             except Exception:
                 pass
 
