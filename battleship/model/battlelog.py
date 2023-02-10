@@ -68,7 +68,7 @@ class BattleLog:
                    for column in hitmap.map
                    for cell in column
                    if cell.contents is not None):
-                return player
+                return self._hitmaps.another_key if self.current_player == player else self.current_player
 
     def make_move(self, target: Coordinates) -> bool:
         bf_plane = self._battlefields.current_value.plane

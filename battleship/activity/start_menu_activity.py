@@ -19,7 +19,8 @@ class StartMenuActivity(Activity):
                     "(1) Start new game\n"
                     "(2) Show top scores\n"
                     "(3) Replay game\n"
-                    "(0) Exit\n"
+                    "(4) Change settings\n"
+                    "(0) Exit\n>>> "
                 ))
                 command = int(command)
                 if command == 1:
@@ -28,6 +29,8 @@ class StartMenuActivity(Activity):
                     return None, GameState.SCOREBOARD
                 if command == 3:
                     return None, GameState.REPLAY
+                if command == 4:
+                    return None, GameState.SETTINGS_SELECTION
                 if command == 0:
                     return None, GameState.EXIT
             except Exception:

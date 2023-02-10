@@ -5,6 +5,8 @@ from battleship.activity.enter_names_acitivty import EnterNamesActivity
 from battleship.activity.game_loop import GameLoop
 from battleship.activity.game_state import GameState
 from battleship.activity.place_ships_loop import PlaceShipsLoop
+from battleship.activity.settings_change_activity import SettingsChangeActivity
+from battleship.activity.settings_selection_activity import SettingsSelectionActivity
 from battleship.activity.start_menu_activity import StartMenuActivity
 from battleship.activity.two_players_activity import TwoPlayersActivity
 from battleship.activity.victory_activity import VictoryActivity
@@ -42,9 +44,13 @@ class MainActivity(Activity):
 
     def _create_current_activity(self) -> Activity:
         if self._current_state == GameState.START_MENU:
+            if isinstance(self._last_result, Settings):
+                self._settings = self._last_result
             return StartMenuActivity()
+
         if self._current_state == GameState.ENTER_NAMES:
             return EnterNamesActivity()
+
         if self._current_state == GameState.PLACE_SHIPS:
             if not isinstance(self._last_result, list):
                 raise Exception("Expected list of names as last activity result")
@@ -62,6 +68,7 @@ class MainActivity(Activity):
                     for loop in loops.values()
                 ))
             )
+
         if self._current_state == GameState.GAME:
             if not isinstance(self._last_result, Couple):
                 raise Exception("Expected Couple of battlefields as last activity result")
@@ -73,9 +80,18 @@ class MainActivity(Activity):
                 next_state=GameState.VICTORY,
                 activity_end_check=lambda _: battle_log.winner is not None
             )
+
         if self._current_state == GameState.VICTORY:
             if not isinstance(self._last_result, Couple):
                 raise Exception("Expected Couple of BattleLogs as last activity result")
             return VictoryActivity(self._last_result.current_value, self._settings)
+
+        if self._current_state == GameState.SETTINGS_SELECTION:
+            return SettingsSelectionActivity(self._settings)
+
+        if self._current_state == GameState.SETTINGS_CHANGE:
+            if not isinstance(self._last_result, str):
+                raise Exception("Expected settings parameter as last activity result")
+            return SettingsChangeActivity(self._settings, self._last_result)
 
         return ActivityPlaceholder(self._current_state)

@@ -9,5 +9,7 @@ class GameState(Enum):
     VICTORY = 'V'
     SCOREBOARD = 'SB'
     SETTINGS = 'S'
+    SETTINGS_SELECTION = 'SS'
+    SETTINGS_CHANGE = 'SC'
     REPLAY = 'R'
     EXIT = 'X'
