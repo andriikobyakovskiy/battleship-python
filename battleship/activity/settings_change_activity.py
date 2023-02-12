@@ -1,3 +1,5 @@
+from pathlib import Path
+
 from battleship.activity.activity import Activity
 from battleship.activity.game_stage import GameStage
 from battleship.model.settings import Settings
@@ -31,13 +33,19 @@ class SettingsChangeActivity(Activity):
                         v = int(value)
                         if 0 < i < 6 and 0 <= v < 4:
                             self._settings.ships_count[i] = v
+                            result = True
                         else:
                             self._error = f"Ships length can be 1-5 and ships count can be 0-4"
                 if self._parameter == "logs_path":
-                    # a lot to check here, just trust user
-                    self._settings.logs_path = new_value
-
-                result = True
+                    try:
+                        path = Path(new_value)
+                        if not path.exists():
+                            path.mkdir()
+                    except OSError:
+                        self._error = "Cannot create log directory for path " + new_value
+                    else:
+                        self._settings.logs_path = new_value
+                        result = True
 
             except Exception as e:
                 self._error = e.args[0]

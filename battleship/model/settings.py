@@ -18,4 +18,4 @@ class Settings:
             5: 0,
         }
     )
-    logs_path: Path = field(default_factory=lambda: Path.home().joinpath(".battlefield"))
+    logs_path: Path = field(default_factory=lambda: Path.home().joinpath(".battleship"))
